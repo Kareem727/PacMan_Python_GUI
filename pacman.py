@@ -1,5 +1,6 @@
 from msilib.schema import Class
 from re import M
+import queue
 from tkinter import *
 import random
 from turtle import window_height, window_width
@@ -48,45 +49,124 @@ class Obstcal:
   canvas.moveto(line2, 300, 100)
   canvas.moveto(line3, 500, 250)
 
- 
-x1 = G_width / 2
-y1 = G_height / 2
-player = canvas.create_rectangle
-def draw_rect():
-    player((x1, y1, x1 + 30, y1 + 30), fill="red")
- 
-def del_rect():
-    player(x1, y1, x1 +30, y1 + 30, fill="white")
- 
-def Move(event):
-    global x1, y1
-    print(event.char)
-    if event.char == "a":
-        del_rect()
-        x1 -= 30
-    elif event.char == "d":
-        del_rect()
-        x1 += 30
-    elif event.char == "w":
-        del_rect()
-        y1 -= 30
-    elif event.char == "s":
-        del_rect()
-        y1 += 30
-    draw_rect()
-window.bind("<Key>", Move)
+# def FindTaarget(): 
+def createMaze2():
 
+    maze = []
+    maze.append([" "," ", " ", " ", " ", " ", " ", " ", " "])
+    maze.append([" "," ", " ", " ", " ", " ", " ", "O", " "])
+    maze.append([" "," ", "/", "/", "/", "/", "/", " ", " "])
+    maze.append([" "," ", " ", " ", " ", " ", " ", " ", " "])
+    maze.append([" ","/", " ", " ", " ", " ", " ", " ", "/"])
+    maze.append([" ","/", " ", " ", " ", " ", " ", "/", " "])
+    maze.append([" ","/", " ", " ", " ", " ", "/", " ", " "])
+    maze.append([" "," ", " ", " ", " ", "/", " ", " ", " "])
+    maze.append([" "," ", " ", " ", " ", " ", " ", "X", " "])
+    return maze
  
-# root.bind("<Key>", move)
-# def change_direction(new_direction):
-#  pass
 
-# def check_col():
-#     pass
+def printMaze(maze, path=""):
+    for x, pos in enumerate(maze[0]):
+        if pos == "O":
+            start = x
 
-# def game_over():
-#     pass
+    i = start
+    j = 0
+    pos = set()
+    for move in path:
+        if move == "L":
+            i -= 1
 
+        elif move == "R":
+            i += 1
+
+        elif move == "U":
+            j -= 1
+
+        elif move == "D":
+            j += 1
+        pos.add((j, i))
+    
+    for j, row in enumerate(maze):
+        for i, col in enumerate(row):
+            if (j, i) in pos:
+                print("+ ", end="")
+            else:
+                print(col + " ", end="")
+        print()
+        
+
+
+def valid(maze, moves):
+    for x, pos in enumerate(maze[0]):
+        if pos == "O":
+            start = x
+
+    i = start
+    j = 0
+    for move in moves:
+        if move == "L":
+            i -= 1
+
+        elif move == "R":
+            i += 1
+
+        elif move == "U":
+            j -= 1
+
+        elif move == "D":
+            j += 1
+
+        if not(0 <= i < len(maze[0]) and 0 <= j < len(maze)):
+            return False
+        elif (maze[j][i] == "/"):
+            return False
+
+    return True
+
+
+def findEnd(maze, moves):
+    for x, pos in enumerate(maze[0]):
+        if pos == "O":
+            start = x
+
+    i = start
+    j = 0
+    for move in moves:
+        if move == "L":
+            i -= 1
+
+        elif move == "R":
+            i += 1
+
+        elif move == "U":
+            j -= 1
+
+        elif move == "D":
+            j += 1
+
+    if maze[j][i] == "X":
+        print("Found: " + moves)
+        printMaze(maze, moves)
+        return True
+
+    return False
+
+
+# MAIN ALGORITHM
+
+nums = queue.Queue()
+nums.put("")
+add = ""
+maze  = createMaze2()
+
+while not findEnd(maze, add): 
+    add = nums.get()
+    print(add)
+    for j in ["L", "R", "U", "D"]:
+        put = add + j
+        if valid(maze, put):
+            nums.put(put)
 
 
 
